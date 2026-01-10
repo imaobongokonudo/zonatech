@@ -369,11 +369,21 @@ if (isset($_POST['bulk_upload_questions']) && wp_verify_nonce($_POST['bulk_nonce
                             $message = "Please select an Exam Type and Subject before uploading.";
                             $message_type = 'error';
                         } else {
-                            // Parse questions directly from content (no year sections required)
-                            $questions = $importer->parse_questions($content);
-                            $answers = $importer->parse_answers($content);
-                            if (!empty($answers)) {
-                                $questions = $importer->merge_questions_with_answers($questions, $answers);
+                            // Check for passage-based content (English language style with inline answers)
+                            $has_passages = preg_match('/^(?:#+\s*)?PASSAGE\s*\d+\s*:/im', $content);
+                            $has_inline_answers = preg_match('/^Answer:?\s*[A-Ea-e]/im', $content);
+                            
+                            if ($has_passages || $has_inline_answers) {
+                                // Use the passage-aware parser for English language style documents
+                                $parsed = $importer->parse_passages_and_questions($content);
+                                $questions = $parsed['questions'];
+                            } else {
+                                // Parse questions directly from content (no year sections required)
+                                $questions = $importer->parse_questions($content);
+                                $answers = $importer->parse_answers($content);
+                                if (!empty($answers)) {
+                                    $questions = $importer->merge_questions_with_answers($questions, $answers);
+                                }
                             }
                             
                             if (!empty($questions)) {

@@ -390,10 +390,14 @@
 
 select.form-control {
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: #1a1a2e;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b5cf6' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.75rem center;
     padding-right: 2rem;
+    cursor: pointer;
 }
 
 select.form-control.form-control-icon {
@@ -401,8 +405,30 @@ select.form-control.form-control-icon {
 }
 
 select.form-control option {
-    background: var(--zona-black-light);
-    color: var(--zona-white);
+    background-color: #1a1a2e;
+    color: #ffffff;
+    padding: 0.5rem;
+}
+
+select.form-control:focus {
+    background-color: #16213e;
+}
+
+/* Global dark select styling for all selects in the app */
+.zonatech-container select,
+#quiz-settings-modal select,
+#quiz-settings-overlay select {
+    background-color: #1a1a2e !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.zonatech-container select option,
+#quiz-settings-modal select option,
+#quiz-settings-overlay select option {
+    background-color: #1a1a2e !important;
+    color: #ffffff !important;
+    padding: 0.75rem;
 }
 
 /* Checkbox and Radio - Purple Theme */

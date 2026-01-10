@@ -350,53 +350,67 @@
             $('#quiz-settings-modal, #quiz-settings-overlay').remove();
             
             const modalHtml = `
-                <div id="quiz-settings-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9998;"></div>
-                <div id="quiz-settings-modal" data-exam="${examType}" data-subject="${subject}" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(135deg, rgba(30, 58, 95, 0.98), rgba(20, 38, 65, 0.98)); border-radius: 20px; padding: 2rem; z-index: 9999; max-width: 450px; width: 90%; box-shadow: 0 25px 50px rgba(0,0,0,0.3);">
-                    <button id="close-quiz-settings-btn" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: #a1a1aa; font-size: 1.5rem; cursor: pointer;">&times;</button>
-                    <h3 style="color: #fff; margin-bottom: 1.5rem; text-align: center;"><i class="fas fa-cog"></i> Quiz Settings</h3>
-                    <p style="color: #a1a1aa; text-align: center; margin-bottom: 1.5rem;">${examType.toUpperCase()} - ${subject}</p>
-                    
-                    <div style="margin-bottom: 1.5rem;">
-                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;"><i class="fas fa-list-ol"></i> Number of Questions</label>
-                        <select id="quiz-question-count" style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-size: 1rem;">
-                            <option value="10">10 questions</option>
-                            <option value="20">20 questions</option>
-                            <option value="30">30 questions</option>
-                            <option value="40">40 questions</option>
-                            <option value="50" selected>50 questions</option>
-                            <option value="75">75 questions</option>
-                            <option value="100">100 questions</option>
-                        </select>
+                <div id="quiz-settings-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(10, 10, 15, 0.98), rgba(26, 26, 46, 0.98)); z-index: 9998; display: flex; align-items: center; justify-content: center; padding: 1rem;">
+                    <div id="quiz-settings-modal" data-exam="${examType}" data-subject="${subject}" style="background: linear-gradient(135deg, rgba(30, 58, 95, 0.95), rgba(20, 38, 65, 0.95)); border-radius: 24px; padding: 2.5rem; width: 100%; max-width: 500px; box-shadow: 0 25px 50px rgba(0,0,0,0.5), 0 0 100px rgba(139, 92, 246, 0.2); border: 1px solid rgba(139, 92, 246, 0.3);">
+                        <button id="close-quiz-settings-btn" style="position: absolute; top: 1.5rem; right: 1.5rem; background: rgba(255,255,255,0.1); border: none; color: #fff; font-size: 1.5rem; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">&times;</button>
+                        
+                        <div style="text-align: center; margin-bottom: 2rem;">
+                            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #8b5cf6, #6366f1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                                <i class="fas fa-cog" style="font-size: 2rem; color: #fff;"></i>
+                            </div>
+                            <h2 style="color: #fff; margin: 0 0 0.5rem; font-size: 1.75rem;">Quiz Settings</h2>
+                            <p style="color: #a1a1aa; margin: 0; font-size: 1.1rem;">${examType.toUpperCase()} - ${subject}</p>
+                        </div>
+                        
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="color: #fff; display: block; margin-bottom: 0.75rem; font-size: 1rem; font-weight: 600;"><i class="fas fa-list-ol" style="margin-right: 0.5rem; color: #8b5cf6;"></i> Number of Questions</label>
+                            <select id="quiz-question-count" class="quiz-select-dark" style="width: 100%; padding: 1rem 1.25rem; border-radius: 12px; background: #1a1a2e; border: 2px solid rgba(139, 92, 246, 0.3); color: #fff; font-size: 1.1rem; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 20 20\"><path fill=\"%238b5cf6\" d=\"M7 7l3 3 3-3\"/></svg>'); background-repeat: no-repeat; background-position: right 1rem center;">
+                                <option value="10">10 questions</option>
+                                <option value="20">20 questions</option>
+                                <option value="30">30 questions</option>
+                                <option value="40">40 questions</option>
+                                <option value="50" selected>50 questions</option>
+                                <option value="75">75 questions</option>
+                                <option value="100">100 questions</option>
+                            </select>
+                        </div>
+                        
+                        <div style="margin-bottom: 2rem;">
+                            <label style="color: #fff; display: block; margin-bottom: 0.75rem; font-size: 1rem; font-weight: 600;"><i class="fas fa-clock" style="margin-right: 0.5rem; color: #8b5cf6;"></i> Time Limit</label>
+                            <select id="quiz-time-minutes" class="quiz-select-dark" style="width: 100%; padding: 1rem 1.25rem; border-radius: 12px; background: #1a1a2e; border: 2px solid rgba(139, 92, 246, 0.3); color: #fff; font-size: 1.1rem; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 20 20\"><path fill=\"%238b5cf6\" d=\"M7 7l3 3 3-3\"/></svg>'); background-repeat: no-repeat; background-position: right 1rem center;">
+                                <option value="0" selected>Auto (based on questions)</option>
+                                <option value="5">5 minutes</option>
+                                <option value="10">10 minutes</option>
+                                <option value="15">15 minutes</option>
+                                <option value="20">20 minutes</option>
+                                <option value="30">30 minutes</option>
+                                <option value="45">45 minutes</option>
+                                <option value="60">60 minutes (1 hour)</option>
+                                <option value="90">90 minutes (1.5 hours)</option>
+                                <option value="120">120 minutes (2 hours)</option>
+                            </select>
+                            <small style="color: #a1a1aa; display: block; margin-top: 0.75rem; font-size: 0.9rem;"><i class="fas fa-info-circle" style="margin-right: 0.25rem;"></i> Auto time: ~12 seconds per question</small>
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem;">
+                            <button id="close-quiz-settings-btn" style="flex: 1; padding: 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer;">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                            <button id="confirm-start-quiz-btn" style="flex: 2; padding: 1rem; background: linear-gradient(135deg, #8b5cf6, #6366f1); border: none; border-radius: 12px; color: #fff; font-size: 1.1rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);">
+                                <i class="fas fa-play"></i> Start Quiz
+                            </button>
+                        </div>
                     </div>
-                    
-                    <div style="margin-bottom: 1.5rem;">
-                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;"><i class="fas fa-clock"></i> Time Limit</label>
-                        <select id="quiz-time-minutes" style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-size: 1rem;">
-                            <option value="0" selected>Auto (based on questions)</option>
-                            <option value="5">5 minutes</option>
-                            <option value="10">10 minutes</option>
-                            <option value="15">15 minutes</option>
-                            <option value="20">20 minutes</option>
-                            <option value="30">30 minutes</option>
-                            <option value="45">45 minutes</option>
-                            <option value="60">60 minutes (1 hour)</option>
-                            <option value="90">90 minutes (1.5 hours)</option>
-                            <option value="120">120 minutes (2 hours)</option>
-                        </select>
-                        <small style="color: #a1a1aa; display: block; margin-top: 0.5rem;">Auto time: ~12 seconds per question</small>
-                    </div>
-                    
-                    <button id="confirm-start-quiz-btn" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #8b5cf6, #6366f1); border: none; border-radius: 10px; color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer;">
-                        <i class="fas fa-play"></i> Start Quiz
-                    </button>
                 </div>
             `;
             
             $('body').append(modalHtml);
+            $('body').css('overflow', 'hidden'); // Prevent background scrolling
         },
         
         // Hide quiz settings modal
         hideQuizSettingsModal: function() {
+            $('body').css('overflow', ''); // Restore scrolling
             $('#quiz-settings-modal, #quiz-settings-overlay').fadeOut(200, function() {
                 $(this).remove();
             });
