@@ -224,6 +224,25 @@ class ZonaTech_Database {
             KEY status (status)
         ) $charset_collate;";
         dbDelta($sql_feedback);
+        
+        // Run migrations to add new columns to existing tables
+        self::run_migrations();
+    }
+    
+    /**
+     * Run database migrations for existing tables
+     * This adds new columns that may not exist on older installations
+     */
+    public static function run_migrations() {
+        global $wpdb;
+        $table_questions = $wpdb->prefix . 'zonatech_questions';
+        
+        // Check if passage_id column exists, if not add it
+        $column_exists = $wpdb->get_results("SHOW COLUMNS FROM $table_questions LIKE 'passage_id'");
+        if (empty($column_exists)) {
+            $wpdb->query("ALTER TABLE $table_questions ADD COLUMN passage_id bigint(20) DEFAULT NULL AFTER year");
+            $wpdb->query("ALTER TABLE $table_questions ADD KEY passage_id (passage_id)");
+        }
     }
     
     public static function seed_sample_data() {

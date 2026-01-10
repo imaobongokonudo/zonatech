@@ -790,6 +790,9 @@ class ZonaTech_Question_Importer {
         $missing_answers = 0;
         $missing_options_count = 0;
         
+        // Check if passage_id column exists (for backward compatibility)
+        $passage_id_column_exists = !empty($wpdb->get_results("SHOW COLUMNS FROM $table_questions LIKE 'passage_id'"));
+        
         foreach ($questions as $number => $question) {
             // Validate question has required fields
             if (empty($question['question_text'])) {
@@ -864,8 +867,8 @@ class ZonaTech_Question_Importer {
                 'explanation' => sanitize_textarea_field($explanation)
             );
             
-            // Add passage_id if present
-            if (!empty($question['passage_id'])) {
+            // Add passage_id if present and column exists
+            if (!empty($question['passage_id']) && $passage_id_column_exists) {
                 $insert_data['passage_id'] = intval($question['passage_id']);
             }
             
