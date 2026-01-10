@@ -377,6 +377,7 @@ if (isset($_POST['bulk_upload_questions']) && wp_verify_nonce($_POST['bulk_nonce
                                 // Use the passage-aware parser for English language style documents
                                 $parsed = $importer->parse_passages_and_questions($content);
                                 $questions = $parsed['questions'];
+                                $passages = isset($parsed['passages']) ? $parsed['passages'] : array();
                             } else {
                                 // Parse questions directly from content (no year sections required)
                                 $questions = $importer->parse_questions($content);
@@ -384,14 +385,34 @@ if (isset($_POST['bulk_upload_questions']) && wp_verify_nonce($_POST['bulk_nonce
                                 if (!empty($answers)) {
                                     $questions = $importer->merge_questions_with_answers($questions, $answers);
                                 }
+                                $passages = array();
                             }
                             
                             if (!empty($questions)) {
+                                // Import passages first if we have any
+                                $passage_map = array();
+                                if (!empty($passages)) {
+                                    $passage_map = $importer->import_passages($passages, $form_exam_type, $form_subject, intval(date('Y')));
+                                    
+                                    // Update question passage_ids with actual database IDs
+                                    foreach ($questions as $q_key => $question) {
+                                        if (!empty($question['passage_id']) && isset($passage_map[$question['passage_id']])) {
+                                            $questions[$q_key]['passage_id'] = $passage_map[$question['passage_id']];
+                                        } else {
+                                            $questions[$q_key]['passage_id'] = null;
+                                        }
+                                    }
+                                }
+                                
                                 // Use form-provided exam type and subject
                                 $result = $importer->import_to_database($questions, $form_exam_type, $form_subject, intval(date('Y')), $allow_without_answers, $allow_missing_options);
                                 
                                 if ($result['success_count'] > 0) {
+                                    $passages_count = count($passage_map);
                                     $message = "Import completed: {$result['success_count']} questions imported!";
+                                    if ($passages_count > 0) {
+                                        $message .= " ($passages_count passages imported)";
+                                    }
                                     $message .= " (" . strtoupper($form_exam_type) . " - $form_subject)";
                                     if ($result['skipped'] > 0) {
                                         $message .= " ({$result['skipped']} duplicates skipped)";
