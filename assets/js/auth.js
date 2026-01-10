@@ -7,8 +7,8 @@
     
     // Helper function for notifications with fallback
     function showNotification(message, type) {
-        if (typeof ZonaTechNotify !== 'undefined' && showNotification) {
-            showNotification(message, type);
+        if (typeof ZonaTechNotify !== 'undefined' && typeof ZonaTechNotify.show === 'function') {
+            ZonaTechNotify.show(message, type);
         } else {
             alert(message);
         }

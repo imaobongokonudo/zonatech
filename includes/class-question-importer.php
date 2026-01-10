@@ -53,88 +53,93 @@ class ZonaTech_Question_Importer {
         $content = str_replace(array("\r\n", "\r"), "\n", $content);
         
         // Pattern to detect passage headers: "PASSAGE 1:", "### PASSAGE 1:", "PASSAGE 1: TITLE"
-        $passage_pattern = '/^(?:#+\s*)?(?:PASSAGE|SECTION\s*[A-Z]?:?\s*COMPREHENSION\s*PASSAGE?S?)\s*(\d+)?:?\s*(.*)$/im';
-        
-        // Split content by passage markers
-        $parts = preg_split($passage_pattern, $content, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+        // Must have "PASSAGE" followed by a number
+        $passage_pattern = '/^(?:#+\s*)?PASSAGE\s*(\d+)\s*:?\s*(.*)$/im';
         
         // If no passage markers found, just parse as regular questions
-        if (count($parts) <= 1 || !preg_match($passage_pattern, $content)) {
+        if (!preg_match($passage_pattern, $content)) {
             $result['questions'] = $this->parse_questions($content);
             return $result;
         }
         
-        // Parse passage sections
-        $current_passage_num = 0;
-        $current_passage_title = '';
-        $current_passage_text = '';
-        $in_passage = false;
-        
+        // Split content by passage markers and capture the delimiter info
         $lines = explode("\n", $content);
-        $i = 0;
         $line_count = count($lines);
         
-        while ($i < $line_count) {
+        // Find all passage start positions
+        $passage_starts = array();
+        for ($i = 0; $i < $line_count; $i++) {
             $line = trim($lines[$i]);
+            if (preg_match('/^(?:#+\s*)?PASSAGE\s*(\d+)\s*:?\s*(.*)$/i', $line, $matches)) {
+                $passage_num = intval($matches[1]);
+                $passage_starts[] = array(
+                    'line' => $i,
+                    'number' => $passage_num,
+                    'title' => trim($matches[2])
+                );
+            }
+        }
+        
+        // Process each passage section
+        for ($p = 0; $p < count($passage_starts); $p++) {
+            $start_line = $passage_starts[$p]['line'] + 1; // Skip the header line
+            $end_line = ($p + 1 < count($passage_starts)) ? $passage_starts[$p + 1]['line'] : $line_count;
             
-            // Check for passage header
-            if (preg_match('/^(?:#+\s*)?(?:PASSAGE|SECTION\s*[A-Z]?:?\s*COMPREHENSION\s*PASSAGE?S?)\s*(\d+)?:?\s*(.*)$/i', $line, $matches)) {
-                // Save previous passage if exists
-                if ($in_passage && !empty($current_passage_text)) {
-                    $result['passages'][$current_passage_num] = array(
-                        'number' => $current_passage_num,
-                        'title' => $current_passage_title,
-                        'text' => trim($current_passage_text)
-                    );
+            $passage_num = $passage_starts[$p]['number'];
+            $passage_title = $passage_starts[$p]['title'];
+            
+            // Collect passage text and questions for this section
+            $passage_text = '';
+            $questions_start_line = -1;
+            
+            for ($i = $start_line; $i < $end_line; $i++) {
+                $line = trim($lines[$i]);
+                
+                // Check if this line starts a question (numbered line)
+                if (preg_match('/^(\d{1,3})\s*[.\)]\s*(.+)$/i', $line, $q_match)) {
+                    $potential_num = intval($q_match[1]);
+                    $text_after = trim($q_match[2]);
+                    
+                    // Looks like a question if it has substantial text and isn't an option
+                    if ($potential_num >= 1 && strlen($text_after) > 10 && !preg_match('/^[A-Ea-e]\s*[.\)]/i', $text_after)) {
+                        $questions_start_line = $i;
+                        break;
+                    }
                 }
                 
-                $current_passage_num = !empty($matches[1]) ? intval($matches[1]) : count($result['passages']) + 1;
-                $current_passage_title = trim($matches[2]);
-                $current_passage_text = '';
-                $in_passage = true;
-                $i++;
-                continue;
-            }
-            
-            // Check for question start (numbered line with substantial text)
-            if (preg_match('/^(\d{1,3})\s*[.\)]\s*(.+)$/i', $line, $q_match)) {
-                $potential_num = intval($q_match[1]);
-                $text_after = trim($q_match[2]);
-                
-                // This might be a question - check if it looks like one
-                if ($potential_num >= 1 && strlen($text_after) > 10 && !preg_match('/^[A-Ea-e]\s*[.\)]/i', $text_after)) {
-                    // Save passage before parsing questions
-                    if ($in_passage && !empty($current_passage_text)) {
-                        $result['passages'][$current_passage_num] = array(
-                            'number' => $current_passage_num,
-                            'title' => $current_passage_title,
-                            'text' => trim($current_passage_text)
-                        );
-                    }
-                    
-                    // Collect remaining content as questions section
-                    $questions_content = implode("\n", array_slice($lines, $i));
-                    $parsed_questions = $this->parse_questions_with_answers($questions_content);
-                    
-                    // Link questions to current passage
-                    foreach ($parsed_questions as $num => $q) {
-                        $q['passage_id'] = $current_passage_num;
-                        $result['questions'][$num] = $q;
-                    }
-                    
-                    break;
+                // Skip section headers like "## SECTION A: COMPREHENSION PASSAGES"
+                if (preg_match('/^#+\s*SECTION\s+[A-Z]:/i', $line)) {
+                    continue;
                 }
-            }
-            
-            // Collect passage text
-            if ($in_passage) {
+                
                 // Skip separator lines
                 if (!preg_match('/^[-–—]{3,}$/', $line)) {
-                    $current_passage_text .= $line . "\n";
+                    $passage_text .= $line . "\n";
                 }
             }
             
-            $i++;
+            // Save passage if we have text
+            $passage_text = trim($passage_text);
+            if (!empty($passage_text)) {
+                $result['passages'][$passage_num] = array(
+                    'number' => $passage_num,
+                    'title' => $passage_title,
+                    'text' => $passage_text
+                );
+            }
+            
+            // Parse questions for this passage section
+            if ($questions_start_line >= 0) {
+                $questions_end_line = $end_line;
+                $questions_content = implode("\n", array_slice($lines, $questions_start_line, $questions_end_line - $questions_start_line));
+                $parsed_questions = $this->parse_questions_with_answers($questions_content);
+                
+                // Link questions to this passage
+                foreach ($parsed_questions as $num => $q) {
+                    $q['passage_id'] = $passage_num;
+                    $result['questions'][$num] = $q;
+                }
+            }
         }
         
         return $result;
