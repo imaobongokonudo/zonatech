@@ -309,7 +309,11 @@
             });
             
             // Close quiz settings modal
-            $(document).on('click', '#close-quiz-settings-btn, #quiz-settings-overlay', function() {
+            $(document).on('click', '#close-quiz-settings-btn, #cancel-quiz-settings-btn, #quiz-settings-overlay', function(e) {
+                // Don't close if clicking inside the modal (except on buttons)
+                if ($(e.target).closest('#quiz-settings-modal').length > 0 && !$(e.target).is('#close-quiz-settings-btn, #cancel-quiz-settings-btn')) {
+                    return;
+                }
                 self.hideQuizSettingsModal();
             });
             
@@ -393,7 +397,7 @@
                         </div>
                         
                         <div style="display: flex; gap: 1rem;">
-                            <button id="close-quiz-settings-btn" style="flex: 1; padding: 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer;">
+                            <button id="cancel-quiz-settings-btn" style="flex: 1; padding: 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer;">
                                 <i class="fas fa-times"></i> Cancel
                             </button>
                             <button id="confirm-start-quiz-btn" style="flex: 2; padding: 1rem; background: linear-gradient(135deg, #8b5cf6, #6366f1); border: none; border-radius: 12px; color: #fff; font-size: 1.1rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);">
