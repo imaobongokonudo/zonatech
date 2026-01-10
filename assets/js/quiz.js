@@ -410,6 +410,10 @@
             
             $('body').append(modalHtml);
             $('body').css('overflow', 'hidden'); // Prevent background scrolling
+            
+            // Scroll to top immediately so the modal is visible
+            window.scrollTo(0, 0);
+            $('html, body').scrollTop(0);
         },
         
         // Hide quiz settings modal

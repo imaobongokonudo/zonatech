@@ -421,6 +421,33 @@ jQuery(document).ready(function($) {
         html += '</div>';
         html += '</div>';
         
+        // Display all passages at the top if there are any (for comprehension sections)
+        var passageKeys = Object.keys(allPassages);
+        if (passageKeys.length > 0 && currentPage === 1) {
+            html += '<div class="passages-section" style="margin-bottom: 2rem;">';
+            html += '<div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(139, 92, 246, 0.3);">';
+            html += '<i class="fas fa-book" style="color: #8b5cf6; font-size: 1.2rem;"></i>';
+            html += '<h3 class="text-white" style="margin: 0; font-size: 1.2rem;">Comprehension Passages</h3>';
+            html += '</div>';
+            
+            // Sort passages by number
+            passageKeys.sort(function(a, b) {
+                return (allPassages[a].number || 0) - (allPassages[b].number || 0);
+            });
+            
+            $.each(passageKeys, function(idx, key) {
+                var passage = allPassages[key];
+                html += '<div class="passage-box" style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">';
+                html += '<div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">';
+                html += '<i class="fas fa-book-reader" style="color: #8b5cf6; font-size: 1.2rem;"></i>';
+                html += '<h4 class="text-white" style="margin: 0; font-size: 1.1rem;">Passage ' + (passage.number || (idx + 1)) + (passage.title ? ': ' + passage.title : '') + '</h4>';
+                html += '</div>';
+                html += '<div class="passage-text" style="color: #e5e5e5; line-height: 1.8; font-size: 0.95rem; white-space: pre-wrap;">' + passage.text + '</div>';
+                html += '</div>';
+            });
+            html += '</div>';
+        }
+        
         // Page info bar
         if (totalPages > 1) {
             html += '<div style="background: rgba(139, 92, 246, 0.15); border-radius: 12px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">';
@@ -434,15 +461,11 @@ jQuery(document).ready(function($) {
         
         if (pageQuestions.length > 0) {
             html += '<div class="questions-list">';
-            var currentPassageId = null;
             
             $.each(pageQuestions, function(index, question) {
                 var questionNumber = startIdx + index + 1;
                 var correctAnswer = question.correct_answer ? question.correct_answer.toUpperCase() : '';
                 var questionId = 'pq-' + questionNumber;
-                
-                // Check if this question has a passage and if it's different from the previous one
-                var passage = getPassageForQuestion(question);
                 if (passage && passage.id !== currentPassageId) {
                     currentPassageId = passage.id;
                     // Display passage before the questions
