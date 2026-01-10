@@ -450,16 +450,55 @@ class ZonaTech_Past_Questions {
         
         global $wpdb;
         $table_questions = $wpdb->prefix . 'zonatech_questions';
+        $table_passages = $wpdb->prefix . 'zonatech_passages';
+        
+        // Check if passage_id column exists
+        $has_passage_id = !empty($wpdb->get_results("SHOW COLUMNS FROM $table_questions LIKE 'passage_id'"));
         
         // Get all questions for this exam type and subject (from all years)
-        $questions = $wpdb->get_results($wpdb->prepare(
-            "SELECT id, question_text, option_a, option_b, option_c, option_d, correct_answer, explanation 
-             FROM $table_questions 
-             WHERE exam_type = %s AND subject = %s 
-             ORDER BY id",
-            $exam_type,
-            $subject
-        ));
+        if ($has_passage_id) {
+            $questions = $wpdb->get_results($wpdb->prepare(
+                "SELECT id, question_text, option_a, option_b, option_c, option_d, correct_answer, explanation, passage_id 
+                 FROM $table_questions 
+                 WHERE exam_type = %s AND subject = %s 
+                 ORDER BY id",
+                $exam_type,
+                $subject
+            ));
+        } else {
+            $questions = $wpdb->get_results($wpdb->prepare(
+                "SELECT id, question_text, option_a, option_b, option_c, option_d, correct_answer, explanation 
+                 FROM $table_questions 
+                 WHERE exam_type = %s AND subject = %s 
+                 ORDER BY id",
+                $exam_type,
+                $subject
+            ));
+        }
+        
+        // Get passages for this subject (for comprehension questions)
+        $passages = array();
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_passages'");
+        if ($table_exists) {
+            $passage_results = $wpdb->get_results($wpdb->prepare(
+                "SELECT id, passage_title, passage_text, passage_number 
+                 FROM $table_passages 
+                 WHERE exam_type = %s AND subject = %s 
+                 ORDER BY passage_number",
+                $exam_type,
+                $subject
+            ));
+            
+            // Index passages by ID for easy lookup
+            foreach ($passage_results as $passage) {
+                $passages[$passage->id] = array(
+                    'id' => $passage->id,
+                    'title' => $passage->passage_title,
+                    'text' => $passage->passage_text,
+                    'number' => $passage->passage_number
+                );
+            }
+        }
         
         // Log activity
         ZonaTech_Activity_Log::log(
@@ -470,6 +509,7 @@ class ZonaTech_Past_Questions {
         
         wp_send_json_success(array(
             'questions' => $questions,
+            'passages' => $passages,
             'total' => count($questions),
             'exam_type' => strtoupper($exam_type),
             'subject' => $subject
