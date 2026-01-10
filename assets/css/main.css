@@ -85,6 +85,12 @@
     box-sizing: border-box;
 }
 
+/* Prevent horizontal scrolling globally */
+html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+}
+
 .zonatech-container {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-size: 14px;
@@ -92,6 +98,7 @@
     color: var(--zona-white);
     background: var(--zona-gradient-dark);
     min-height: 100vh;
+    overflow-x: hidden;
     /* GPU acceleration */
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
@@ -101,6 +108,7 @@
     max-width: 100%;
     margin: 0 auto;
     padding: var(--space-lg) var(--space-xl);
+    overflow-x: hidden;
 }
 
 .zonatech-wrapper-contained {

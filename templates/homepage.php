@@ -118,7 +118,7 @@ if (!defined('ABSPATH')) exit;
                     <div class="stats-label">Years of Questions</div>
                 </div>
                 <div class="stats-card glass-effect">
-                    <div class="stats-value">15+</div>
+                    <div class="stats-value">10+</div>
                     <div class="stats-label">Subjects</div>
                 </div>
                 <div class="stats-card glass-effect">

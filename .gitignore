@@ -20,4 +20,4 @@ uploads/
 node_modules/
 
 # Compiled files
-*.log
+*.logScreenshot*.png
