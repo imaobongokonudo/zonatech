@@ -406,7 +406,7 @@ jQuery(document).ready(function($) {
         html += '</div>';
         html += '<div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">';
         html += '<button class="btn btn-primary" onclick="startQuiz(\'' + currentExamType + '\', \'' + currentSubject + '\')">';
-        html += '<i class="fas fa-play"></i> Start Quiz (50 Questions)';
+        html += '<i class="fas fa-play"></i> Take Quiz';
         html += '</button>';
         html += '</div>';
         html += '</div>';
@@ -532,7 +532,7 @@ jQuery(document).ready(function($) {
             html += '<div style="text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">';
             html += '<p class="text-muted" style="margin-bottom: 1rem;">Ready to test your knowledge?</p>';
             html += '<button class="btn btn-primary btn-lg" onclick="startQuiz(\'' + currentExamType + '\', \'' + currentSubject + '\')" style="padding: 1rem 2rem; font-size: 1.1rem;">';
-            html += '<i class="fas fa-play"></i> Start Practice Quiz (50 Random Questions)';
+            html += '<i class="fas fa-play"></i> Start Practice Quiz';
             html += '</button>';
             html += '</div>';
             
@@ -677,9 +677,9 @@ jQuery(document).ready(function($) {
 
 // Start quiz function (global scope)
 function startQuiz(examType, subject) {
-    // Use the ZonaTechQuiz system to start the quiz
-    if (typeof ZonaTechQuiz !== 'undefined' && typeof ZonaTechQuiz.startQuiz === 'function') {
-        ZonaTechQuiz.startQuiz(examType.toLowerCase(), subject);
+    // Use the ZonaTechQuiz system to show quiz settings modal first
+    if (typeof ZonaTechQuiz !== 'undefined' && typeof ZonaTechQuiz.showQuizSettingsModal === 'function') {
+        ZonaTechQuiz.showQuizSettingsModal(examType.toLowerCase(), subject);
     } else {
         console.error('ZonaTechQuiz not available');
         alert('Quiz system failed to load. Please check your internet connection and reload the page.');
