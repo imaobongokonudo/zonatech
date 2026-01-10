@@ -196,7 +196,7 @@ if (!defined('ABSPATH')) exit;
                         </div>
                         <h3 class="text-white"><?php echo esc_html($exam['name']); ?></h3>
                         <p class="text-muted"><?php echo esc_html($exam['full_name']); ?></p>
-                        <p style="font-size: 0.85rem; color: var(--zona-white-muted);">2010 - Present • 15+ Subjects</p>
+                        <p style="font-size: 0.85rem; color: var(--zona-white-muted);">2010 - Present • 10+ Subjects</p>
                     </div>
                 <?php endforeach; ?>
             </div>
