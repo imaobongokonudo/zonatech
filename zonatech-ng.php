@@ -104,6 +104,7 @@ class ZonaTech_NG {
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
         add_action('wp_footer', array($this, 'render_support_buttons'));
         add_action('wp_footer', array($this, 'render_pwa_prompt'));
+        add_action('wp_footer', array($this, 'render_calculator_widget'));
         add_action('wp_head', array($this, 'add_pwa_meta'));
         add_action('wp_head', array($this, 'add_favicon'));
         add_action('wp_login', array($this, 'update_last_activity'), 10, 2);
@@ -503,6 +504,64 @@ class ZonaTech_NG {
                 <div class="pwa-actions">
                     <button id="zonatech-pwa-install" class="btn btn-primary btn-sm">Install</button>
                     <button id="zonatech-pwa-dismiss" class="btn btn-ghost btn-sm">Later</button>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+    
+    /**
+     * Render global calculator widget
+     */
+    public function render_calculator_widget() {
+        ?>
+        <div id="calculator-widget" class="calculator-widget" title="Calculator">
+            <button id="calculator-toggle" class="calculator-toggle-btn" title="Calculator">
+                <i class="fas fa-calculator"></i>
+            </button>
+            <div id="calculator-panel" class="calculator-panel" style="display: none;">
+                <div class="calculator-header">
+                    <span><i class="fas fa-calculator"></i> Calculator</span>
+                    <button id="calculator-close" class="calculator-close-btn">&times;</button>
+                </div>
+                <div class="calculator-display">
+                    <input type="text" id="calc-display" readonly value="0">
+                </div>
+                <div class="calculator-buttons">
+                    <button class="calc-btn calc-clear" data-action="clear">C</button>
+                    <button class="calc-btn calc-clear" data-action="backspace">⌫</button>
+                    <button class="calc-btn calc-op" data-action="(">(</button>
+                    <button class="calc-btn calc-op" data-action=")">)</button>
+                    
+                    <button class="calc-btn calc-func" data-action="sin">sin</button>
+                    <button class="calc-btn calc-func" data-action="cos">cos</button>
+                    <button class="calc-btn calc-func" data-action="tan">tan</button>
+                    <button class="calc-btn calc-op" data-action="/">÷</button>
+                    
+                    <button class="calc-btn" data-action="7">7</button>
+                    <button class="calc-btn" data-action="8">8</button>
+                    <button class="calc-btn" data-action="9">9</button>
+                    <button class="calc-btn calc-op" data-action="*">×</button>
+                    
+                    <button class="calc-btn" data-action="4">4</button>
+                    <button class="calc-btn" data-action="5">5</button>
+                    <button class="calc-btn" data-action="6">6</button>
+                    <button class="calc-btn calc-op" data-action="-">−</button>
+                    
+                    <button class="calc-btn" data-action="1">1</button>
+                    <button class="calc-btn" data-action="2">2</button>
+                    <button class="calc-btn" data-action="3">3</button>
+                    <button class="calc-btn calc-op" data-action="+">+</button>
+                    
+                    <button class="calc-btn" data-action="0">0</button>
+                    <button class="calc-btn" data-action=".">.</button>
+                    <button class="calc-btn calc-func" data-action="sqrt">√</button>
+                    <button class="calc-btn calc-equals" data-action="=">=</button>
+                    
+                    <button class="calc-btn calc-func" data-action="pow">x²</button>
+                    <button class="calc-btn calc-func" data-action="pi">π</button>
+                    <button class="calc-btn calc-func" data-action="percent">%</button>
+                    <button class="calc-btn calc-func" data-action="negate">±</button>
                 </div>
             </div>
         </div>

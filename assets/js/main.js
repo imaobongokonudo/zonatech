@@ -35,6 +35,7 @@
             this.initTabs();
             this.initMobileMenu();
             this.initNotifications();
+            this.initCalculator();
         },
         
         // Scroll Progress Bar - OPTIMIZED with throttle
@@ -226,6 +227,187 @@
                     return colors[type] || colors.info;
                 }
             };
+        },
+        
+        // Global Scientific Calculator
+        initCalculator: function() {
+            // Calculator state variables
+            let calcExpression = '';
+            let calcResult = '0';
+            let lastWasResult = false;
+            
+            // Toggle calculator panel
+            $(document).on('click', '#calculator-toggle', function() {
+                const panel = $('#calculator-panel');
+                if (panel.is(':visible')) {
+                    panel.slideUp(200);
+                } else {
+                    panel.slideDown(200);
+                    $('#calc-display').val('0');
+                }
+            });
+            
+            // Close calculator
+            $(document).on('click', '#calculator-close', function() {
+                $('#calculator-panel').slideUp(200);
+            });
+            
+            // Calculator button handling
+            $(document).on('click', '.calc-btn', function() {
+                const action = $(this).data('action');
+                const display = $('#calc-display');
+                
+                // Clear
+                if (action === 'clear') {
+                    calcExpression = '';
+                    calcResult = '0';
+                    lastWasResult = false;
+                    display.val('0');
+                    return;
+                }
+                
+                // Backspace
+                if (action === 'backspace') {
+                    if (lastWasResult) {
+                        calcExpression = '';
+                        calcResult = '0';
+                        lastWasResult = false;
+                    } else {
+                        calcExpression = calcExpression.slice(0, -1);
+                    }
+                    display.val(calcExpression || '0');
+                    return;
+                }
+                
+                // If last action was result and user presses a number, start fresh
+                if (lastWasResult && !isNaN(action)) {
+                    calcExpression = action;
+                    lastWasResult = false;
+                    display.val(calcExpression);
+                    return;
+                }
+                
+                // If last action was result and user presses operator, continue from result
+                if (lastWasResult && ['+', '-', '*', '/'].includes(action)) {
+                    calcExpression = calcResult + action;
+                    lastWasResult = false;
+                    display.val(calcExpression);
+                    return;
+                }
+                
+                lastWasResult = false;
+                
+                // Scientific functions
+                if (action === 'sin') {
+                    try {
+                        const val = parseFloat(calcExpression || calcResult);
+                        calcResult = String(Math.sin(val * Math.PI / 180));
+                        calcExpression = calcResult;
+                        lastWasResult = true;
+                        display.val(calcResult.substring(0, 12));
+                    } catch(e) { display.val('Error'); }
+                    return;
+                }
+                
+                if (action === 'cos') {
+                    try {
+                        const val = parseFloat(calcExpression || calcResult);
+                        calcResult = String(Math.cos(val * Math.PI / 180));
+                        calcExpression = calcResult;
+                        lastWasResult = true;
+                        display.val(calcResult.substring(0, 12));
+                    } catch(e) { display.val('Error'); }
+                    return;
+                }
+                
+                if (action === 'tan') {
+                    try {
+                        const val = parseFloat(calcExpression || calcResult);
+                        calcResult = String(Math.tan(val * Math.PI / 180));
+                        calcExpression = calcResult;
+                        lastWasResult = true;
+                        display.val(calcResult.substring(0, 12));
+                    } catch(e) { display.val('Error'); }
+                    return;
+                }
+                
+                if (action === 'sqrt') {
+                    try {
+                        const val = parseFloat(calcExpression || calcResult);
+                        calcResult = String(Math.sqrt(val));
+                        calcExpression = calcResult;
+                        lastWasResult = true;
+                        display.val(calcResult.substring(0, 12));
+                    } catch(e) { display.val('Error'); }
+                    return;
+                }
+                
+                if (action === 'pow') {
+                    try {
+                        const val = parseFloat(calcExpression || calcResult);
+                        calcResult = String(Math.pow(val, 2));
+                        calcExpression = calcResult;
+                        lastWasResult = true;
+                        display.val(calcResult.substring(0, 12));
+                    } catch(e) { display.val('Error'); }
+                    return;
+                }
+                
+                if (action === 'pi') {
+                    calcExpression += String(Math.PI);
+                    display.val(calcExpression.substring(0, 15));
+                    return;
+                }
+                
+                if (action === 'percent') {
+                    try {
+                        const val = parseFloat(calcExpression || calcResult);
+                        calcResult = String(val / 100);
+                        calcExpression = calcResult;
+                        lastWasResult = true;
+                        display.val(calcResult.substring(0, 12));
+                    } catch(e) { display.val('Error'); }
+                    return;
+                }
+                
+                if (action === 'negate') {
+                    try {
+                        const val = parseFloat(calcExpression || calcResult);
+                        calcResult = String(-val);
+                        calcExpression = calcResult;
+                        lastWasResult = true;
+                        display.val(calcResult.substring(0, 12));
+                    } catch(e) { display.val('Error'); }
+                    return;
+                }
+                
+                // Equals - evaluate expression
+                if (action === '=') {
+                    try {
+                        // Safe evaluation
+                        calcResult = String(Function('"use strict"; return (' + calcExpression + ')')());
+                        // Handle infinity and NaN
+                        if (!isFinite(parseFloat(calcResult))) {
+                            display.val('Error');
+                            calcExpression = '';
+                            calcResult = '0';
+                        } else {
+                            display.val(calcResult.substring(0, 12));
+                            calcExpression = calcResult;
+                            lastWasResult = true;
+                        }
+                    } catch(e) {
+                        display.val('Error');
+                        calcExpression = '';
+                        calcResult = '0';
+                    }
+                    return;
+                }
+                
+                // Numbers and operators
+                calcExpression += action;
+                display.val(calcExpression);
+            });
         },
         
         // AJAX Helper
