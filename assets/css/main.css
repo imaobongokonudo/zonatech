@@ -1479,7 +1479,7 @@ body.page-template-default .entry-title {
     position: fixed;
     bottom: 20px;
     left: 20px;
-    z-index: 1000;
+    z-index: 9999;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -1497,11 +1497,22 @@ body.page-template-default .entry-title {
     display: flex;
     align-items: center;
     justify-content: center;
+    animation: calculatorPulse 2s ease-in-out infinite;
+}
+
+@keyframes calculatorPulse {
+    0%, 100% {
+        box-shadow: 0 4px 20px rgba(139, 92, 246, 0.5), 0 0 0 4px rgba(139, 92, 246, 0.2);
+    }
+    50% {
+        box-shadow: 0 4px 30px rgba(139, 92, 246, 0.7), 0 0 0 8px rgba(139, 92, 246, 0.15);
+    }
 }
 
 .calculator-toggle-btn:hover {
     transform: scale(1.1);
     box-shadow: 0 6px 25px rgba(139, 92, 246, 0.6), 0 0 0 6px rgba(139, 92, 246, 0.3);
+    animation: none;
 }
 
 .calculator-panel {

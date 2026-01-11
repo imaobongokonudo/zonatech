@@ -6,15 +6,6 @@
 (function($) {
     'use strict';
     
-    // Initialize immediately when DOM is interactive (faster than ready)
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            ZonaTech.init();
-        });
-    } else {
-        ZonaTech.init();
-    }
-    
     const ZonaTech = {
         init: function() {
             // Use requestIdleCallback for non-critical tasks
@@ -450,5 +441,10 @@
     
     // Expose globally
     window.ZonaTech = ZonaTech;
+    
+    // Initialize when DOM is ready
+    $(function() {
+        ZonaTech.init();
+    });
     
 })(jQuery);
