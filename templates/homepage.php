@@ -146,7 +146,7 @@ if (!defined('ABSPATH')) exit;
                         <i class="fas fa-book-open"></i>
                     </div>
                     <h3 class="service-card-title">Past Questions</h3>
-                    <p class="service-card-desc">Access JAMB, WAEC, and NECO past questions from 2010 to present with detailed answers.</p>
+                    <p class="service-card-desc">Access JAMB, WAEC, and NECO past questions with detailed answers from combined years.</p>
                     <p class="service-card-price">₦<?php echo number_format(ZONATECH_SUBJECT_PRICE); ?>/subject</p>
                     <a href="<?php echo site_url('/zonatech-past-questions/'); ?>" class="btn btn-primary">
                         <i class="fas fa-arrow-right"></i> View Questions
@@ -196,7 +196,7 @@ if (!defined('ABSPATH')) exit;
                         </div>
                         <h3 class="text-white"><?php echo esc_html($exam['name']); ?></h3>
                         <p class="text-muted"><?php echo esc_html($exam['full_name']); ?></p>
-                        <p style="font-size: 0.85rem; color: var(--zona-white-muted);">2010 - Present • 10+ Subjects</p>
+                        <p style="font-size: 0.85rem; color: var(--zona-white-muted);">Combined Years • 10+ Subjects</p>
                     </div>
                 <?php endforeach; ?>
             </div>

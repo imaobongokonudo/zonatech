@@ -289,6 +289,13 @@ jQuery(document).ready(function($) {
             return;
         }
         
+        // Check if WAEC or NECO - show Coming Soon
+        if (examType === 'waec' || examType === 'neco') {
+            $subjectSelect.html('<option value="">Coming Soon</option>');
+            showNotification(examType.toUpperCase() + ' past questions are coming soon! Currently only JAMB is available.', 'info');
+            return;
+        }
+        
         // Fetch subjects for the selected exam type
         $.ajax({
             url: zonatech_ajax.ajax_url,
@@ -803,6 +810,12 @@ jQuery(document).ready(function($) {
         
         if (!examType) {
             $grid.hide().html('');
+            return;
+        }
+        
+        // Check if WAEC or NECO - show Coming Soon
+        if (examType === 'waec' || examType === 'neco') {
+            $grid.html('<div class="glass-effect text-center" style="padding: 3rem; border-radius: 12px;"><i class="fas fa-clock" style="font-size: 3rem; color: #f59e0b; margin-bottom: 1rem;"></i><h3 class="text-white">Coming Soon!</h3><p class="text-muted">' + examType.toUpperCase() + ' past questions are coming soon. Currently only JAMB questions are available.</p></div>').show();
             return;
         }
         
