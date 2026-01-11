@@ -1472,3 +1472,198 @@ body.page-template-default .entry-title {
         margin-bottom: 2rem;
     }
 }
+/* =============================================
+   Calculator Widget for Quiz
+   ============================================= */
+.calculator-widget {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 1000;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.calculator-toggle-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.5), 0 0 0 4px rgba(139, 92, 246, 0.2);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calculator-toggle-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(139, 92, 246, 0.6), 0 0 0 6px rgba(139, 92, 246, 0.3);
+}
+
+.calculator-panel {
+    position: absolute;
+    bottom: 70px;
+    left: 0;
+    width: 280px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(139, 92, 246, 0.3);
+    overflow: hidden;
+}
+
+.calculator-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.calculator-header span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.calculator-close-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: #fff;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.calculator-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.calculator-display {
+    padding: 12px;
+    background: #0f0f1a;
+}
+
+.calculator-display input {
+    width: 100%;
+    padding: 12px 16px;
+    background: #1a1a2e;
+    border: 2px solid rgba(139, 92, 246, 0.3);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 1.5rem;
+    font-family: 'Fira Code', 'Consolas', monospace;
+    text-align: right;
+    outline: none;
+}
+
+.calculator-display input:focus {
+    border-color: rgba(139, 92, 246, 0.6);
+}
+
+.calculator-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    padding: 12px;
+    background: #0f0f1a;
+}
+
+.calc-btn {
+    padding: 14px 8px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    background: #1a1a2e;
+    color: #fff;
+}
+
+.calc-btn:hover {
+    background: #2a2a4e;
+    transform: translateY(-2px);
+}
+
+.calc-btn:active {
+    transform: translateY(0);
+}
+
+.calc-btn.calc-op {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: #fff;
+}
+
+.calc-btn.calc-op:hover {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+}
+
+.calc-btn.calc-func {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: #fff;
+    font-size: 0.85rem;
+}
+
+.calc-btn.calc-func:hover {
+    background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+}
+
+.calc-btn.calc-clear {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #fff;
+}
+
+.calc-btn.calc-clear:hover {
+    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+}
+
+.calc-btn.calc-equals {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    color: #fff;
+}
+
+.calc-btn.calc-equals:hover {
+    background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+}
+
+/* Responsive adjustments for calculator */
+@media (max-width: 768px) {
+    .calculator-widget {
+        bottom: 15px;
+        left: 15px;
+    }
+    
+    .calculator-toggle-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+    
+    .calculator-panel {
+        width: 260px;
+        bottom: 60px;
+    }
+    
+    .calc-btn {
+        padding: 12px 6px;
+        font-size: 0.9rem;
+    }
+    
+    .calculator-display input {
+        font-size: 1.3rem;
+        padding: 10px 12px;
+    }
+}
