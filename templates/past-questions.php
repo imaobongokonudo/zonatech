@@ -473,17 +473,6 @@ jQuery(document).ready(function($) {
                 var questionNumber = startIdx + index + 1;
                 var correctAnswer = question.correct_answer ? question.correct_answer.toUpperCase() : '';
                 var questionId = 'pq-' + questionNumber;
-                if (passage && passage.id !== currentPassageId) {
-                    currentPassageId = passage.id;
-                    // Display passage before the questions
-                    html += '<div class="passage-box" style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">';
-                    html += '<div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">';
-                    html += '<i class="fas fa-book-reader" style="color: #8b5cf6; font-size: 1.2rem;"></i>';
-                    html += '<h4 class="text-white" style="margin: 0; font-size: 1.1rem;">Passage ' + passage.number + (passage.title ? ': ' + passage.title : '') + '</h4>';
-                    html += '</div>';
-                    html += '<div class="passage-text" style="color: #e5e5e5; line-height: 1.8; font-size: 0.95rem; white-space: pre-wrap;">' + passage.text + '</div>';
-                    html += '</div>';
-                }
                 
                 html += '<div class="question-item glass-effect" id="' + questionId + '" data-correct="' + correctAnswer + '" data-answered="false" style="padding: 1.5rem; margin-bottom: 1rem; border-radius: 12px; border: 1px solid rgba(139, 92, 246, 0.2);">';
                 html += '<p class="text-white" style="font-weight: 600; font-size: 1rem; line-height: 1.6;"><span style="display: inline-block; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; padding: 2px 10px; border-radius: 6px; margin-right: 10px; font-size: 0.85rem;">Q' + questionNumber + '</span>' + question.question_text + '</p>';
