@@ -46,12 +46,22 @@ class ZonaTech_Quiz_System {
         // Limit question count between 10 and 100
         $question_count = max(10, min(100, $question_count));
         
-        // Check access
+        // Check access - Quiz is only available for paid users
         $past_questions = ZonaTech_Past_Questions::get_instance();
         if (!$past_questions->user_has_access($user_id, $exam_type, $subject)) {
+            $category = ZonaTech_Past_Questions::get_subject_category($subject);
+            $categories = ZonaTech_Past_Questions::get_subject_categories();
+            $cat_info = isset($categories[$category]) ? $categories[$category] : null;
+            
             wp_send_json_error(array(
-                'message' => 'You need to purchase access to this subject first.',
-                'require_payment' => true
+                'message' => 'Quiz mode requires a paid subscription. Subscribe to access unlimited questions and quizzes!',
+                'require_payment' => true,
+                'exam_type' => $exam_type,
+                'subject' => $subject,
+                'category' => $category,
+                'category_name' => $cat_info ? $cat_info['name'] : ucfirst($category),
+                'monthly_price' => defined('ZONATECH_MONTHLY_PRICE') ? ZONATECH_MONTHLY_PRICE : 5000,
+                'sixmonth_price' => defined('ZONATECH_6MONTH_PRICE') ? ZONATECH_6MONTH_PRICE : 25000
             ));
         }
         

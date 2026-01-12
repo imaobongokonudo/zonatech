@@ -431,22 +431,9 @@ class ZonaTech_Past_Questions {
             wp_send_json_error(array('message' => 'Invalid request parameters.'));
         }
         
-        // Check if user has access
-        if (!$this->user_has_access($user_id, $exam_type, $subject)) {
-            $category = self::get_subject_category($subject);
-            $categories = self::get_subject_categories();
-            $cat_info = isset($categories[$category]) ? $categories[$category] : null;
-            
-            wp_send_json_error(array(
-                'message' => 'You need to purchase access to the ' . ($cat_info ? $cat_info['name'] : ucfirst($category)) . ' category.',
-                'require_payment' => true,
-                'exam_type' => $exam_type,
-                'subject' => $subject,
-                'category' => $category,
-                'category_name' => $cat_info ? $cat_info['name'] : ucfirst($category),
-                'price' => ZONATECH_CATEGORY_PRICE
-            ));
-        }
+        // Check if user has paid access
+        $has_paid_access = $this->user_has_access($user_id, $exam_type, $subject);
+        $free_limit = defined('ZONATECH_FREE_QUESTIONS_LIMIT') ? ZONATECH_FREE_QUESTIONS_LIMIT : 10;
         
         global $wpdb;
         $table_questions = $wpdb->prefix . 'zonatech_questions';
@@ -507,12 +494,33 @@ class ZonaTech_Past_Questions {
             sprintf('Accessed %s %s questions', strtoupper($exam_type), $subject)
         );
         
+        // For free users, limit to first 10 questions
+        $total_questions = count($questions);
+        $is_limited = false;
+        $category = self::get_subject_category($subject);
+        $categories = self::get_subject_categories();
+        $cat_info = isset($categories[$category]) ? $categories[$category] : null;
+        
+        if (!$has_paid_access && $total_questions > $free_limit) {
+            $questions = array_slice($questions, 0, $free_limit);
+            $is_limited = true;
+        }
+        
         wp_send_json_success(array(
             'questions' => $questions,
             'passages' => $passages,
-            'total' => count($questions),
+            'total' => $total_questions,
+            'shown' => count($questions),
             'exam_type' => strtoupper($exam_type),
-            'subject' => $subject
+            'subject' => $subject,
+            'has_paid_access' => $has_paid_access,
+            'is_limited' => $is_limited,
+            'free_limit' => $free_limit,
+            'require_payment' => $is_limited,
+            'category' => $category,
+            'category_name' => $cat_info ? $cat_info['name'] : ucfirst($category),
+            'monthly_price' => defined('ZONATECH_MONTHLY_PRICE') ? ZONATECH_MONTHLY_PRICE : 5000,
+            'sixmonth_price' => defined('ZONATECH_6MONTH_PRICE') ? ZONATECH_6MONTH_PRICE : 25000
         ));
     }
     

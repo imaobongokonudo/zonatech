@@ -60,6 +60,7 @@ class ZonaTech_Paystack {
         $valid_amounts = array(
             'subject' => ZONATECH_SUBJECT_PRICE,
             'category' => defined('ZONATECH_CATEGORY_PRICE') ? ZONATECH_CATEGORY_PRICE : 5000,
+            'subscription' => defined('ZONATECH_MONTHLY_PRICE') ? ZONATECH_MONTHLY_PRICE : 5000, // Default to monthly
             'nin_slip' => ZONATECH_NIN_SLIP_PRICE,
             'nin_standard_slip' => ZONATECH_NIN_STANDARD_SLIP_PRICE,
             'scratch_card' => ZONATECH_SCRATCH_CARD_PRICE,
@@ -71,6 +72,16 @@ class ZonaTech_Paystack {
             'nin_verification' => 280, // Default - will be updated based on slip type
             'nin_validation' => 2300,
         );
+        
+        // Handle subscription pricing based on plan
+        if ($payment_type === 'subscription' && isset($meta_data['plan'])) {
+            $plan = strtolower($meta_data['plan']);
+            if ($plan === 'sixmonth') {
+                $valid_amounts['subscription'] = defined('ZONATECH_6MONTH_PRICE') ? ZONATECH_6MONTH_PRICE : 25000;
+            } else {
+                $valid_amounts['subscription'] = defined('ZONATECH_MONTHLY_PRICE') ? ZONATECH_MONTHLY_PRICE : 5000;
+            }
+        }
         
         // Handle dynamic NIN verification pricing based on slip type
         if ($payment_type === 'nin_verification' && isset($meta_data['slip_type'])) {
@@ -317,8 +328,30 @@ class ZonaTech_Paystack {
         $meta_data = json_decode($purchase->meta_data, true);
         
         switch ($purchase->purchase_type) {
+            case 'subscription':
+                // Handle subscription with expiration date based on plan
+                $table_access = $wpdb->prefix . 'zonatech_user_access';
+                $plan = $meta_data['plan'] ?? 'monthly';
+                
+                // Calculate expiration date based on plan
+                if ($plan === 'sixmonth') {
+                    $expires_at = date('Y-m-d H:i:s', strtotime('+6 months'));
+                } else {
+                    $expires_at = date('Y-m-d H:i:s', strtotime('+1 month'));
+                }
+                
+                $wpdb->insert($table_access, array(
+                    'user_id' => $purchase->user_id,
+                    'exam_type' => $meta_data['exam_type'] ?? '',
+                    'category' => $meta_data['category'] ?? '',
+                    'subject' => null,
+                    'purchase_id' => $purchase->id,
+                    'expires_at' => $expires_at
+                ));
+                break;
+            
             case 'category':
-                // Grant access to all subjects in a category
+                // Grant access to all subjects in a category (1 month default for backward compatibility)
                 $table_access = $wpdb->prefix . 'zonatech_user_access';
                 $wpdb->insert($table_access, array(
                     'user_id' => $purchase->user_id,
@@ -326,12 +359,12 @@ class ZonaTech_Paystack {
                     'category' => $meta_data['category'] ?? '',
                     'subject' => null,
                     'purchase_id' => $purchase->id,
-                    'expires_at' => date('Y-m-d H:i:s', strtotime('+1 year'))
+                    'expires_at' => date('Y-m-d H:i:s', strtotime('+1 month'))
                 ));
                 break;
                 
             case 'subject':
-                // Legacy: Grant access to individual subject
+                // Legacy: Grant access to individual subject (1 month)
                 $table_access = $wpdb->prefix . 'zonatech_user_access';
                 $wpdb->insert($table_access, array(
                     'user_id' => $purchase->user_id,
@@ -339,7 +372,7 @@ class ZonaTech_Paystack {
                     'subject' => $meta_data['subject'] ?? '',
                     'category' => null,
                     'purchase_id' => $purchase->id,
-                    'expires_at' => date('Y-m-d H:i:s', strtotime('+1 year'))
+                    'expires_at' => date('Y-m-d H:i:s', strtotime('+1 month'))
                 ));
                 break;
                 

@@ -43,6 +43,9 @@ define('ZONATECH_SUPPORT_EMAIL', 'support@zonatechng.com');
 
 // Price Constants (in Naira)
 define('ZONATECH_SUBJECT_PRICE', 5000);
+define('ZONATECH_MONTHLY_PRICE', 5000);           // Monthly subscription - ₦5,000/month
+define('ZONATECH_6MONTH_PRICE', 25000);           // 6-month subscription - ₦25,000/6 months
+define('ZONATECH_FREE_QUESTIONS_LIMIT', 10);      // Number of free questions before payment required
 define('ZONATECH_NIN_SLIP_PRICE', 2000);          // Premium NIN Slip
 define('ZONATECH_NIN_STANDARD_SLIP_PRICE', 1000); // Standard NIN Slip
 define('ZONATECH_SCRATCH_CARD_PRICE', 5000);      // Default scratch card price
@@ -440,6 +443,9 @@ class ZonaTech_NG {
             'paystack_public_key' => ZONATECH_PAYSTACK_PUBLIC_KEY,
             'paystack_configured' => !empty(ZONATECH_PAYSTACK_PUBLIC_KEY),
             'subject_price' => ZONATECH_SUBJECT_PRICE,
+            'monthly_price' => defined('ZONATECH_MONTHLY_PRICE') ? ZONATECH_MONTHLY_PRICE : 5000,
+            'sixmonth_price' => defined('ZONATECH_6MONTH_PRICE') ? ZONATECH_6MONTH_PRICE : 25000,
+            'free_questions_limit' => defined('ZONATECH_FREE_QUESTIONS_LIMIT') ? ZONATECH_FREE_QUESTIONS_LIMIT : 10,
             'nin_price' => ZONATECH_NIN_SLIP_PRICE,
             'nin_standard_price' => ZONATECH_NIN_STANDARD_SLIP_PRICE,
             'scratch_card_price' => ZONATECH_SCRATCH_CARD_PRICE,

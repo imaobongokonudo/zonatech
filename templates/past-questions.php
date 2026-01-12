@@ -71,16 +71,19 @@ if (!defined('ABSPATH')) exit;
                         </div>
                         <h3 class="service-card-title"><?php echo esc_html($exam['name']); ?></h3>
                         <p class="service-card-desc"><?php echo esc_html($exam['full_name']); ?></p>
-                        <p class="service-card-price">₦<?php echo number_format(defined('ZONATECH_CATEGORY_PRICE') ? ZONATECH_CATEGORY_PRICE : 5000); ?>/category</p>
+                        <p class="service-card-price">₦<?php echo number_format(defined('ZONATECH_MONTHLY_PRICE') ? ZONATECH_MONTHLY_PRICE : 5000); ?>/month</p>
+                        <p class="service-card-price-alt" style="font-size: 0.8rem; color: #a78bfa;">or ₦<?php echo number_format(defined('ZONATECH_6MONTH_PRICE') ? ZONATECH_6MONTH_PRICE : 25000); ?>/6 months</p>
                     </div>
                 <?php endforeach; ?>
             </div>
+            <p class="text-success mt-2" style="font-size: 0.9rem;"><i class="fas fa-gift"></i> <strong>Free Preview:</strong> First <?php echo defined('ZONATECH_FREE_QUESTIONS_LIMIT') ? ZONATECH_FREE_QUESTIONS_LIMIT : 10; ?> questions in all subjects are FREE!</p>
         </div>
         
         <!-- Category Selection Section -->
         <div class="glass-card mb-3" id="category-section">
             <h3 class="text-white"><i class="fas fa-layer-group"></i> Subject Categories</h3>
-            <p class="text-muted mb-2">Purchase a category to access all subjects within it. Select exam type first, then choose a category.</p>
+            <p class="text-muted mb-2">Subscribe to access unlimited questions and quizzes. Select exam type first, then choose a category.</p>
+            <p class="text-warning mb-2" style="font-size: 0.85rem;"><i class="fas fa-info-circle"></i> <strong>Pricing:</strong> ₦<?php echo number_format(defined('ZONATECH_MONTHLY_PRICE') ? ZONATECH_MONTHLY_PRICE : 5000); ?>/month or ₦<?php echo number_format(defined('ZONATECH_6MONTH_PRICE') ? ZONATECH_6MONTH_PRICE : 25000); ?>/6 months</p>
             <p class="text-success mb-2"><i class="fas fa-star"></i> <strong>Mathematics & English are compulsory</strong> - Included in ALL categories!</p>
             
             <div class="form-group mb-2">
@@ -394,6 +397,19 @@ jQuery(document).ready(function($) {
         currentSubject = data.subject;
         currentPage = 1;
         
+        // Store subscription info
+        window.questionData = {
+            has_paid_access: data.has_paid_access || false,
+            is_limited: data.is_limited || false,
+            free_limit: data.free_limit || 10,
+            total: data.total || 0,
+            shown: data.shown || allQuestions.length,
+            category: data.category || '',
+            category_name: data.category_name || '',
+            monthly_price: data.monthly_price || 5000,
+            sixmonth_price: data.sixmonth_price || 25000
+        };
+        
         renderQuestionsPage();
     }
     
@@ -415,16 +431,30 @@ jQuery(document).ready(function($) {
         
         var html = '<div class="glass-card">';
         
+        // Check if user is limited (free tier)
+        var isLimited = window.questionData && window.questionData.is_limited;
+        var totalAvailable = window.questionData ? window.questionData.total : totalQuestions;
+        
         // Header with stats
         html += '<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; gap: 1rem;">';
         html += '<div>';
         html += '<h3 class="text-white" style="margin: 0;"><i class="fas fa-book-open"></i> ' + currentExamType + ' ' + currentSubject + '</h3>';
-        html += '<p class="text-muted" style="margin: 0.5rem 0 0;">Total Questions: <strong class="text-white">' + totalQuestions + '</strong></p>';
+        if (isLimited) {
+            html += '<p class="text-muted" style="margin: 0.5rem 0 0;">Showing <strong class="text-white">' + totalQuestions + '</strong> of <strong class="text-warning">' + totalAvailable + '</strong> questions <span class="text-warning" style="font-size: 0.85rem;">(Free Preview)</span></p>';
+        } else {
+            html += '<p class="text-muted" style="margin: 0.5rem 0 0;">Total Questions: <strong class="text-white">' + totalQuestions + '</strong></p>';
+        }
         html += '</div>';
         html += '<div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">';
-        html += '<button class="btn btn-primary" onclick="startQuiz(\'' + currentExamType + '\', \'' + currentSubject + '\')">';
-        html += '<i class="fas fa-play"></i> Take Quiz';
-        html += '</button>';
+        if (isLimited) {
+            html += '<button class="btn btn-success" onclick="subscribeCategory(\'' + currentExamType.toLowerCase() + '\', \'' + (window.questionData ? window.questionData.category : '') + '\', \'monthly\')">';
+            html += '<i class="fas fa-unlock"></i> Subscribe to Unlock All';
+            html += '</button>';
+        } else {
+            html += '<button class="btn btn-primary" onclick="startQuiz(\'' + currentExamType + '\', \'' + currentSubject + '\')">';
+            html += '<i class="fas fa-play"></i> Take Quiz';
+            html += '</button>';
+        }
         html += '</div>';
         html += '</div>';
         
@@ -573,13 +603,40 @@ jQuery(document).ready(function($) {
                 html += '</div>';
             }
             
-            // Bottom quiz button
-            html += '<div style="text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">';
-            html += '<p class="text-muted" style="margin-bottom: 1rem;">Ready to test your knowledge?</p>';
-            html += '<button class="btn btn-primary btn-lg" onclick="startQuiz(\'' + currentExamType + '\', \'' + currentSubject + '\')" style="padding: 1rem 2rem; font-size: 1.1rem;">';
-            html += '<i class="fas fa-play"></i> Start Practice Quiz';
-            html += '</button>';
-            html += '</div>';
+            // Show subscription prompt if user is limited (free trial ended)
+            if (window.questionData && window.questionData.is_limited) {
+                html += '<div class="subscription-prompt" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(124, 58, 237, 0.1) 100%); border: 2px solid rgba(139, 92, 246, 0.5); border-radius: 16px; padding: 2rem; margin-top: 2rem; text-align: center;">';
+                html += '<div style="margin-bottom: 1rem;"><i class="fas fa-lock" style="font-size: 3rem; color: #8b5cf6;"></i></div>';
+                html += '<h3 class="text-white" style="margin-bottom: 0.5rem;">Unlock All ' + window.questionData.total + ' Questions!</h3>';
+                html += '<p class="text-muted" style="margin-bottom: 1.5rem;">You\'ve viewed the first ' + window.questionData.free_limit + ' free questions. Subscribe to access all questions and take unlimited quizzes!</p>';
+                
+                html += '<div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-bottom: 1.5rem;">';
+                html += '<div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 12px; padding: 1.5rem; min-width: 200px;">';
+                html += '<p class="text-muted" style="margin: 0 0 0.5rem; font-size: 0.9rem;">Monthly Plan</p>';
+                html += '<p class="text-white" style="margin: 0; font-size: 1.5rem; font-weight: 700;">₦' + window.questionData.monthly_price.toLocaleString() + '<span style="font-size: 0.9rem; font-weight: 400; color: #a78bfa;">/month</span></p>';
+                html += '<button class="btn btn-primary" onclick="subscribeCategory(\'' + currentExamType + '\', \'' + window.questionData.category + '\', \'monthly\')" style="margin-top: 1rem; width: 100%;">Subscribe Monthly</button>';
+                html += '</div>';
+                
+                html += '<div style="background: rgba(139, 92, 246, 0.15); border: 2px solid rgba(139, 92, 246, 0.5); border-radius: 12px; padding: 1.5rem; min-width: 200px; position: relative;">';
+                html += '<div style="position: absolute; top: -10px; right: 10px; background: linear-gradient(135deg, #22c55e, #16a34a); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">BEST VALUE</div>';
+                html += '<p class="text-muted" style="margin: 0 0 0.5rem; font-size: 0.9rem;">6-Month Plan</p>';
+                html += '<p class="text-white" style="margin: 0; font-size: 1.5rem; font-weight: 700;">₦' + window.questionData.sixmonth_price.toLocaleString() + '<span style="font-size: 0.9rem; font-weight: 400; color: #a78bfa;">/6 months</span></p>';
+                html += '<p class="text-success" style="margin: 0.25rem 0 0; font-size: 0.8rem;">Save ₦' + ((window.questionData.monthly_price * 6) - window.questionData.sixmonth_price).toLocaleString() + '!</p>';
+                html += '<button class="btn btn-primary" onclick="subscribeCategory(\'' + currentExamType + '\', \'' + window.questionData.category + '\', \'sixmonth\')" style="margin-top: 1rem; width: 100%;">Subscribe 6 Months</button>';
+                html += '</div>';
+                html += '</div>';
+                
+                html += '<p class="text-muted" style="font-size: 0.85rem; margin: 0;"><i class="fas fa-check-circle" style="color: #22c55e;"></i> Full access to all questions <i class="fas fa-check-circle" style="color: #22c55e; margin-left: 1rem;"></i> Unlimited quiz attempts</p>';
+                html += '</div>';
+            } else {
+                // Bottom quiz button (only for paid users)
+                html += '<div style="text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">';
+                html += '<p class="text-muted" style="margin-bottom: 1rem;">Ready to test your knowledge?</p>';
+                html += '<button class="btn btn-primary btn-lg" onclick="startQuiz(\'' + currentExamType + '\', \'' + currentSubject + '\')" style="padding: 1rem 2rem; font-size: 1.1rem;">';
+                html += '<i class="fas fa-play"></i> Start Practice Quiz';
+                html += '</button>';
+                html += '</div>';
+            }
             
         } else {
             html += '<p class="text-muted text-center">No questions available for this selection.</p>';
@@ -731,6 +788,44 @@ function startQuiz(examType, subject) {
     }
 }
 
+// Subscribe to category function (global scope) - supports monthly and 6-month plans
+function subscribeCategory(examType, category, plan) {
+    console.log('subscribeCategory called:', examType, category, plan);
+    
+    var price = plan === 'sixmonth' ? 
+        (window.questionData ? window.questionData.sixmonth_price : 25000) : 
+        (window.questionData ? window.questionData.monthly_price : 5000);
+    
+    var duration = plan === 'sixmonth' ? '6 months' : '1 month';
+    
+    if (typeof ZonaTechPayment !== 'undefined' && typeof ZonaTechPayment.initiatePayment === 'function') {
+        // Check if Paystack is configured
+        if (typeof zonatech_ajax !== 'undefined' && zonatech_ajax.paystack_configured) {
+            console.log('Initiating subscription payment for:', examType, category, price, plan);
+            
+            // Use the ZonaTechPayment system to initiate payment
+            ZonaTechPayment.initiatePayment('subscription', price, {
+                exam_type: examType,
+                category: category,
+                plan: plan,
+                duration: duration
+            });
+        } else {
+            console.error('Paystack not configured');
+            if (typeof ZonaTechNotify !== 'undefined') {
+                ZonaTechNotify.show('Payment system is not configured. Please contact support.', 'error', 5000);
+            } else {
+                alert('Payment system is not configured. Please contact support.');
+            }
+        }
+    } else {
+        console.error('ZonaTechPayment not available', typeof ZonaTechPayment);
+        alert('Payment system failed to load. Please refresh the page and try again.');
+    }
+    
+    return false;
+}
+
 // Purchase category function (global scope)
 function purchaseCategory(examType, category) {
     console.log('purchaseCategory called:', examType, category);
@@ -738,7 +833,7 @@ function purchaseCategory(examType, category) {
     if (typeof ZonaTechPayment !== 'undefined' && typeof ZonaTechPayment.initiatePayment === 'function') {
         // Check if Paystack is configured
         if (typeof zonatech_ajax !== 'undefined' && zonatech_ajax.paystack_configured) {
-            var price = zonatech_ajax.category_price || 5000;
+            var price = zonatech_ajax.monthly_price || 5000;
             console.log('Initiating category payment for:', examType, category, price);
             
             // Use the ZonaTechPayment system to initiate payment
