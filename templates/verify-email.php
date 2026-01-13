@@ -134,14 +134,21 @@ jQuery(document).ready(function($) {
             success: function(response) {
                 console.log('Verification response:', response);
                 if (response && response.success) {
-                    // Show success card
+                    // Show success message
+                    if (typeof ZonaTechNotify !== 'undefined') {
+                        ZonaTechNotify.success(response.data.message || 'Email verified successfully!');
+                    }
+                    
+                    // Show success card briefly, then redirect
                     $('#verification-card').fadeOut(300, function() {
                         $('#success-card').fadeIn(300);
                     });
                     
-                    if (typeof ZonaTechNotify !== 'undefined') {
-                        ZonaTechNotify.success(response.data.message || 'Email verified successfully!');
-                    }
+                    // Auto-redirect to login after 2 seconds
+                    setTimeout(function() {
+                        var redirectUrl = (response.data && response.data.redirect) ? response.data.redirect : '<?php echo site_url('/zonatech-login/'); ?>';
+                        window.location.href = redirectUrl;
+                    }, 2000);
                 } else {
                     var errorMsg = (response && response.data && response.data.message) ? response.data.message : 'Verification failed. Please try again.';
                     if (typeof ZonaTechNotify !== 'undefined') {
