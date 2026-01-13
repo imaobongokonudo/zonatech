@@ -399,6 +399,27 @@
                 calcExpression += action;
                 display.val(calcExpression);
             });
+            
+            // Make calculator follow page scroll
+            const widget = document.getElementById('calculator-widget');
+            if (widget) {
+                let scrollTicking = false;
+                const updateCalculatorPosition = () => {
+                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    widget.style.top = (scrollTop + 20) + 'px';
+                    scrollTicking = false;
+                };
+                
+                window.addEventListener('scroll', function() {
+                    if (!scrollTicking) {
+                        requestAnimationFrame(updateCalculatorPosition);
+                        scrollTicking = true;
+                    }
+                }, { passive: true });
+                
+                // Set initial position
+                updateCalculatorPosition();
+            }
         },
         
         // AJAX Helper

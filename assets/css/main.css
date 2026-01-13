@@ -1476,11 +1476,12 @@ body.page-template-default .entry-title {
    Calculator Widget for Quiz
    ============================================= */
 .calculator-widget {
-    position: fixed;
+    position: absolute;
     top: 20px;
     left: 20px;
     z-index: 9999;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    transition: top 0.1s ease-out;
 }
 
 .calculator-toggle-btn {
