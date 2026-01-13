@@ -27,6 +27,13 @@ class ZonaTech_Activity_Log {
         global $wpdb;
         $table_activity = $wpdb->prefix . 'zonatech_activity_log';
         
+        // Check if table exists before trying to insert
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_activity'") === $table_activity;
+        if (!$table_exists) {
+            // Table doesn't exist, silently skip logging
+            return;
+        }
+        
         $ip_address = '';
         if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
             $ip_address = sanitize_text_field($_SERVER['HTTP_CLIENT_IP']);

@@ -602,8 +602,15 @@ class ZonaTech_User_Auth {
         wp_set_current_user($login->ID);
         wp_set_auth_cookie($login->ID, $remember);
         
-        // Log activity
-        ZonaTech_Activity_Log::log($user->ID, 'login', 'User logged in');
+        // Log activity (wrapped in try-catch to prevent login failure if activity log has issues)
+        try {
+            if (class_exists('ZonaTech_Activity_Log')) {
+                ZonaTech_Activity_Log::log($user->ID, 'login', 'User logged in');
+            }
+        } catch (Exception $e) {
+            // Silently fail - don't block login due to activity logging issues
+            error_log('ZonaTech: Activity log error during login - ' . $e->getMessage());
+        }
         
         wp_send_json_success(array(
             'message' => 'Login successful!',
