@@ -125,6 +125,8 @@ jQuery(document).ready(function($) {
         $.ajax({
             url: zonatech_ajax.ajax_url,
             type: 'POST',
+            dataType: 'json',
+            timeout: 30000,
             data: {
                 action: 'zonatech_verify_email',
                 nonce: zonatech_ajax.nonce,
@@ -161,10 +163,24 @@ jQuery(document).ready(function($) {
             },
             error: function(xhr, status, error) {
                 console.error('AJAX Error:', status, error, xhr.responseText);
+                var errorMessage = 'An error occurred. Please try again.';
+                if (status === 'timeout') {
+                    errorMessage = 'Request timed out. Please try again.';
+                } else if (xhr.responseText) {
+                    // Try to parse the response
+                    try {
+                        var resp = JSON.parse(xhr.responseText);
+                        if (resp.data && resp.data.message) {
+                            errorMessage = resp.data.message;
+                        }
+                    } catch(e) {
+                        console.error('Failed to parse error response');
+                    }
+                }
                 if (typeof ZonaTechNotify !== 'undefined') {
-                    ZonaTechNotify.error('An error occurred. Please try again.');
+                    ZonaTechNotify.error(errorMessage);
                 } else {
-                    alert('An error occurred. Please try again.');
+                    alert(errorMessage);
                 }
                 $btn.prop('disabled', false).html(originalText);
             },

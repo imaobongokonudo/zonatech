@@ -200,12 +200,6 @@ $vnin_slip_price = 300;
                         </div>
                     </div>
                     
-                    <!-- Transaction PIN -->
-                    <div class="form-group">
-                        <label class="text-white"><i class="fas fa-key"></i> 4-Digit Transaction PIN *</label>
-                        <input type="password" name="transaction_pin" class="form-control" placeholder="Enter 4-digit PIN" maxlength="4" pattern="\d{4}" required>
-                    </div>
-                    
                     <!-- Contact Info -->
                     <div class="form-group">
                         <label class="text-white"><i class="fas fa-envelope"></i> Email *</label>
@@ -263,12 +257,6 @@ $vnin_slip_price = 300;
                     <div class="form-group">
                         <label class="text-white"><i class="fas fa-id-badge"></i> 11-Digit NIN Number *</label>
                         <input type="text" name="nin" class="form-control" placeholder="Enter your 11-digit NIN" maxlength="11" pattern="\d{11}" required>
-                    </div>
-                    
-                    <!-- Transaction PIN -->
-                    <div class="form-group">
-                        <label class="text-white"><i class="fas fa-key"></i> 4-Digit Transaction PIN *</label>
-                        <input type="password" name="transaction_pin" class="form-control" placeholder="Enter 4-digit PIN" maxlength="4" pattern="\d{4}" required>
                     </div>
                     
                     <!-- Contact Info -->
